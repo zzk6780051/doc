@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China_zzk文档</title>
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        :root {
+            /* 亮色主题变量 */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-sidebar: #f0f2f5;
+            --text-primary: #2c3e50;
+            --text-secondary: #5c6b7e;
+            --accent-color: #4a6cf7;
+            --border-color: #e1e4e8;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            /* 暗色主题变量 */
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-sidebar: #252525;
+            --text-primary: #e9ecef;
+            --text-secondary: #adb5bd;
+            --accent-color: #4a6cf7;
+            --border-color: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px var(--shadow-color);
+            z-index: 100;
+        }
+
+        .navbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .navbar-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .theme-toggle, .sidebar-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            padding: 0.3rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover, .sidebar-toggle:hover {
+            background-color: var(--bg-sidebar);
+        }
+
+        /* 主要内容区域 */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-content {
+            padding: 1.5rem 1rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.4rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.6rem 0.8rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .sidebar-menu a.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .project-list, .personal-list, .sponsor-list {
+            margin-left: 0.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .project-list.expanded, .personal-list.expanded, .sponsor-list.expanded {
+            max-height: 500px;
+        }
+
+        .project-list li, .personal-list li, .sponsor-list li {
+            margin-bottom: 0.2rem;
+        }
+
+        .project-list a, .personal-list a, .sponsor-list a {
+            padding-left: 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .project-header, .personal-header, .sponsor-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.6rem 0.8rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .project-header:hover, .personal-header:hover, .sponsor-header:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .project-header .icon, .personal-header .icon, .sponsor-header .icon {
+            margin-right: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .project-header .icon.rotated, .personal-header .icon.rotated, .sponsor-header .icon.rotated {
+            transform: rotate(90deg);
+        }
+
+        /* 主内容区域 */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--bg-primary);
+            position: relative;
+        }
+
+        /* Cloudflare Turnstile 容器 */
+        .turnstile-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .turnstile-container p {
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* 移动端遮罩层 */
+        .sidebar-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+
+        .content h1 {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content h2 {
+            margin: 1.5rem 0 1rem;
+        }
+
+        .content h3 {
+            margin: 1.2rem 0 0.8rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content code {
+            background-color: var(--bg-secondary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .content pre {
+            background-color: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .content blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .content th, .content td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content th {
+            background-color: var(--bg-secondary);
+            font-weight: 600;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        .sponsor-images {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .sponsor-item {
+            text-align: center;
+        }
+
+        .sponsor-item img {
+            max-width: 200px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                box-shadow: 2px 0 5px var(--shadow-color);
+            }
+
+            .sidebar-overlay {
+                display: block;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .sidebar-overlay.active {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+
+            .sponsor-images {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-title">China_zzk 文档</div>
+        <div class="navbar-controls">
+            <button class="theme-toggle" title="切换主题">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+                </svg>
+            </button>
+            <button class="sidebar-toggle" title="切换侧边栏">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <!-- 调整顺序：1.个人简介 -->
+                <div class="sidebar-section">
+                    <ul class="sidebar-menu" id="personal-list">
+                        <!-- 个人简介列表将通过JavaScript动态生成 -->
+                    </ul>
+                </div>
+                
+                <!-- 2.项目 -->
+                <div class="sidebar-section">
+                    <ul class="sidebar-menu" id="project-list">
+                        <!-- 项目列表将通过JavaScript动态生成 -->
+                    </ul>
+                </div>
+                
+                <!-- 3.赞助 -->
+                <div class="sidebar-section">
+                    <ul class="sidebar-menu" id="sponsor-list">
+                        <!-- 赞助列表将通过JavaScript动态生成 -->
+                    </ul>
+                </div>
+                
+                <!-- Cloudflare Turnstile 验证 -->
+                <div class="turnstile-container">
+                    <p>请完成验证以继续访问</p>
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAB8dxiNIoXp1CwJ6" data-theme="auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 移动端遮罩层 -->
+        <div class="sidebar-overlay"></div>
+
+        <div class="content">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        // 配置和初始化
+        const CONFIG = {
+            dataFile: './data.json',
+            defaultFile: 'my/about.md'
+        };
+
+        // 状态管理
+        const state = {
+            theme: localStorage.getItem('theme') || 'light',
+            sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+            currentFile: localStorage.getItem('currentFile') || CONFIG.defaultFile,
+            projects: [],
+            isMobile: window.innerWidth <= 768,
+            expandedProjects: JSON.parse(localStorage.getItem('expandedProjects')) || {},
+            expandedPersonal: localStorage.getItem('expandedPersonal') === 'true' || true, // 默认展开个人简介
+            expandedSponsor: localStorage.getItem('expandedSponsor') === 'true' || false
+        };
+
+        // DOM 元素
+        const dom = {
+            body: document.body,
+            sidebar: document.querySelector('.sidebar'),
+            content: document.querySelector('.content'),
+            themeToggle: document.querySelector('.theme-toggle'),
+            sidebarToggle: document.querySelector('.sidebar-toggle'),
+            personalList: document.getElementById('personal-list'),
+            sponsorList: document.getElementById('sponsor-list'),
+            projectList: document.getElementById('project-list'),
+            sidebarOverlay: document.querySelector('.sidebar-overlay')
+        };
+
+        // 初始化应用
+        function init() {
+            // 应用保存的主题
+            applyTheme(state.theme);
+            
+            // 应用侧边栏状态
+            if (state.sidebarCollapsed) {
+                dom.sidebar.classList.add('collapsed');
+            }
+            
+            // 加载项目数据
+            loadProjectData();
+            
+            // 渲染个人简介和赞助列表
+            renderPersonalList();
+            renderSponsorList();
+            
+            // 加载初始内容
+            loadContent(state.currentFile);
+            
+            // 设置事件监听器
+            setupEventListeners();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', handleResize);
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 主题切换
+            dom.themeToggle.addEventListener('click', toggleTheme);
+            
+            // 侧边栏切换
+            dom.sidebarToggle.addEventListener('click', toggleSidebar);
+            
+            // 移动端遮罩层点击
+            dom.sidebarOverlay.addEventListener('click', collapseSidebar);
+            
+            // 内容区域点击（移动端时收起侧边栏）
+            dom.content.addEventListener('click', function(e) {
+                if (state.isMobile && !dom.sidebar.classList.contains('collapsed')) {
+                    collapseSidebar();
+                }
+            });
+        }
+
+        // 处理窗口大小变化
+        function handleResize() {
+            state.isMobile = window.innerWidth <= 768;
+            
+            // 在桌面端移除遮罩层激活状态
+            if (!state.isMobile) {
+                dom.sidebarOverlay.classList.remove('active');
+            }
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            applyTheme(state.theme);
+            localStorage.setItem('theme', state.theme);
+            
+            // 更新 Turnstile 主题
+            updateTurnstileTheme();
+        }
+
+        // 应用主题
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                dom.body.setAttribute('data-theme', 'dark');
+            } else {
+                dom.body.removeAttribute('data-theme');
+            }
+        }
+
+        // 更新 Turnstile 主题
+        function updateTurnstileTheme() {
+            const turnstileContainer = document.querySelector('.cf-turnstile');
+            if (turnstileContainer) {
+                // 重新渲染 Turnstile 以应用新主题
+                turnstileContainer.setAttribute('data-theme', state.theme);
+                
+                // 如果 Turnstile 已加载，重新渲染它
+                if (window.turnstile) {
+                    const sitekey = turnstileContainer.getAttribute('data-sitekey');
+                    const container = document.querySelector('.cf-turnstile');
+                    
+                    // 移除现有的 Turnstile
+                    container.innerHTML = '';
+                    
+                    // 重新渲染 Turnstile
+                    window.turnstile.render(container, {
+                        sitekey: sitekey,
+                        theme: state.theme,
+                        callback: function(token) {
+                            console.log('验证成功:', token);
+                        }
+                    });
+                }
+            }
+        }
+
+        // 切换侧边栏
+        function toggleSidebar() {
+            if (dom.sidebar.classList.contains('collapsed')) {
+                expandSidebar();
+            } else {
+                collapseSidebar();
+            }
+        }
+
+        // 展开侧边栏
+        function expandSidebar() {
+            dom.sidebar.classList.remove('collapsed');
+            state.sidebarCollapsed = false;
+            localStorage.setItem('sidebarCollapsed', state.sidebarCollapsed);
+            
+            // 在移动端显示遮罩层
+            if (state.isMobile) {
+                dom.sidebarOverlay.classList.add('active');
+            }
+        }
+
+        // 收起侧边栏
+        function collapseSidebar() {
+            dom.sidebar.classList.add('collapsed');
+            state.sidebarCollapsed = true;
+            localStorage.setItem('sidebarCollapsed', state.sidebarCollapsed);
+            
+            // 在移动端隐藏遮罩层
+            if (state.isMobile) {
+                dom.sidebarOverlay.classList.remove('active');
+            }
+        }
+
+        // 加载项目数据
+        async function loadProjectData() {
+            try {
+                const response = await fetch(CONFIG.dataFile);
+                const data = await response.json();
+                state.projects = data.projects || [];
+                renderProjectList();
+            } catch (error) {
+                console.error('加载项目数据失败:', error);
+                state.projects = [];
+            }
+        }
+
+        // 渲染个人简介列表
+        function renderPersonalList() {
+            const personalItems = [
+                { name: "关于我", file: "my/about.md" },
+                { name: "联系", file: "my/contact.md" },
+                { name: "相关链接", file: "my/links.md" }
+            ];
+            
+            const isExpanded = state.expandedPersonal;
+            
+            let html = `
+                <li>
+                    <div class="personal-header" data-section="personal">
+                        <span class="icon ${isExpanded ? 'rotated' : ''}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </span>
+                        <span>个人简介</span>
+                    </div>
+                    <ul class="personal-list ${isExpanded ? 'expanded' : ''}" id="personal-section">
+                        ${personalItems.map(item => 
+                            `<li><a href="#" data-file="${item.file}">${item.name}</a></li>`
+                        ).join('')}
+                    </ul>
+                </li>
+            `;
+            
+            dom.personalList.innerHTML = html;
+            
+            // 为个人简介标题添加点击事件（展开/收起）
+            dom.personalList.querySelector('.personal-header').addEventListener('click', function() {
+                const personalSection = document.getElementById('personal-section');
+                const icon = this.querySelector('.icon');
+                
+                // 切换展开状态
+                if (personalSection.classList.contains('expanded')) {
+                    personalSection.classList.remove('expanded');
+                    icon.classList.remove('rotated');
+                    state.expandedPersonal = false;
+                } else {
+                    personalSection.classList.add('expanded');
+                    icon.classList.add('rotated');
+                    state.expandedPersonal = true;
+                }
+                
+                // 保存状态
+                localStorage.setItem('expandedPersonal', state.expandedPersonal);
+            });
+            
+            // 为个人简介链接添加事件监听器
+            dom.personalList.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const file = this.getAttribute('data-file');
+                    handleLinkClick(this, file);
+                });
+            });
+        }
+
+        // 渲染赞助列表
+        function renderSponsorList() {
+            const sponsorItems = [
+                { name: "微信", file: "sponsor/wechat.md" },
+                { name: "支付宝", file: "sponsor/alipay.md" }
+            ];
+            
+            const isExpanded = state.expandedSponsor;
+            
+            let html = `
+                <li>
+                    <div class="sponsor-header" data-section="sponsor">
+                        <span class="icon ${isExpanded ? 'rotated' : ''}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </span>
+                        <span>赞助</span>
+                    </div>
+                    <ul class="sponsor-list ${isExpanded ? 'expanded' : ''}" id="sponsor-section">
+                        ${sponsorItems.map(item => 
+                            `<li><a href="#" data-file="${item.file}">${item.name}</a></li>`
+                        ).join('')}
+                    </ul>
+                </li>
+            `;
+            
+            dom.sponsorList.innerHTML = html;
+            
+            // 为赞助标题添加点击事件（展开/收起）
+            dom.sponsorList.querySelector('.sponsor-header').addEventListener('click', function() {
+                const sponsorSection = document.getElementById('sponsor-section');
+                const icon = this.querySelector('.icon');
+                
+                // 切换展开状态
+                if (sponsorSection.classList.contains('expanded')) {
+                    sponsorSection.classList.remove('expanded');
+                    icon.classList.remove('rotated');
+                    state.expandedSponsor = false;
+                } else {
+                    sponsorSection.classList.add('expanded');
+                    icon.classList.add('rotated');
+                    state.expandedSponsor = true;
+                }
+                
+                // 保存状态
+                localStorage.setItem('expandedSponsor', state.expandedSponsor);
+            });
+            
+            // 为赞助链接添加事件监听器
+            dom.sponsorList.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const file = this.getAttribute('data-file');
+                    handleLinkClick(this, file);
+                });
+            });
+        }
+
+        // 渲染项目列表
+        function renderProjectList() {
+            if (state.projects.length === 0) {
+                dom.projectList.innerHTML = '<li><a href="#" data-file="projects.md">项目列表</a></li>';
+                return;
+            }
+            
+            let html = '';
+            
+            state.projects.forEach((project, index) => {
+                const projectId = `project-${index}`;
+                const isExpanded = state.expandedProjects[projectId] || false;
+                
+                html += `
+                    <li>
+                        <div class="project-header" data-project="${projectId}">
+                            <span class="icon ${isExpanded ? 'rotated' : ''}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </span>
+                            <span>${project.name}</span>
+                        </div>
+                        <ul class="project-list ${isExpanded ? 'expanded' : ''}" id="${projectId}">
+                            ${project.files ? project.files.map(file => 
+                                `<li><a href="#" data-file="projects/${project.folder}/${file.file}">${file.name}</a></li>`
+                            ).join('') : ''}
+                        </ul>
+                    </li>
+                `;
+            });
+            
+            dom.projectList.innerHTML = html;
+            
+            // 为项目标题添加点击事件（展开/收起）
+            dom.projectList.querySelectorAll('.project-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project');
+                    const projectList = document.getElementById(projectId);
+                    const icon = this.querySelector('.icon');
+                    
+                    // 切换展开状态
+                    if (projectList.classList.contains('expanded')) {
+                        projectList.classList.remove('expanded');
+                        icon.classList.remove('rotated');
+                        state.expandedProjects[projectId] = false;
+                    } else {
+                        projectList.classList.add('expanded');
+                        icon.classList.add('rotated');
+                        state.expandedProjects[projectId] = true;
+                    }
+                    
+                    // 保存状态
+                    localStorage.setItem('expandedProjects', JSON.stringify(state.expandedProjects));
+                });
+            });
+            
+            // 为项目链接添加事件监听器
+            dom.projectList.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const file = this.getAttribute('data-file');
+                    handleLinkClick(this, file);
+                });
+            });
+        }
+
+        // 处理链接点击
+        function handleLinkClick(linkElement, file) {
+            // 更新活动状态
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            linkElement.classList.add('active');
+            
+            // 加载内容
+            loadContent(file);
+            
+            // 在移动端点击链接后自动收起侧边栏
+            if (state.isMobile) {
+                collapseSidebar();
+            }
+        }
+
+        // 加载内容
+        async function loadContent(file) {
+            try {
+                dom.content.innerHTML = '<div class="loading">加载中...</div>';
+                
+                // 特殊处理赞助页面
+                if (file === 'sponsor/wechat.md' || file === 'sponsor/alipay.md') {
+                    displaySponsorPage(file);
+                    state.currentFile = file;
+                    localStorage.setItem('currentFile', file);
+                    return;
+                }
+                
+                const response = await fetch(file);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const markdown = await response.text();
+                const html = marked.parse(markdown);
+                
+                dom.content.innerHTML = html;
+                state.currentFile = file;
+                localStorage.setItem('currentFile', file);
+            } catch (error) {
+                console.error('加载内容失败:', error);
+                dom.content.innerHTML = `
+                    <h1>加载失败</h1>
+                    <p>无法加载文件: ${file}</p>
+                    <p>错误信息: ${error.message}</p>
+                `;
+            }
+        }
+
+        // 显示赞助页面
+        function displaySponsorPage(file) {
+            const isWechat = file === 'sponsor/wechat.md';
+            const title = isWechat ? '微信赞助' : '支付宝赞助';
+            const imageFile = isWechat ? 'img/wechat.png' : 'img/alipay.png';
+            
+            const html = `
+                <h1>${title}</h1>
+                <p>感谢您的支持！如果我的项目对您有帮助，欢迎通过${isWechat ? '微信' : '支付宝'}赞助支持。</p>
+                <div class="sponsor-images">
+                    <div class="sponsor-item">
+                        <img src="${imageFile}" alt="${isWechat ? '微信收款码' : '支付宝收款码'}" />
+                        <p>${isWechat ? '微信扫码赞助' : '支付宝扫码赞助'}</p>
+                    </div>
+                </div>
+                <p>您的支持将帮助我持续开发和维护更多优秀的项目。</p>
+            `;
+            
+            dom.content.innerHTML = html;
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    
+    <!-- 引入 marked.js 用于解析 Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://activify.china-zzk.com/tracker.min.js" data-website-id="China_zzk文档"></script>
+</body>
+</html>
