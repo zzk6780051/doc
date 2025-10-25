@@ -9,11 +9,12 @@
       ]
     },
     {
-      "name": "项目二", 
-      "folder": "project2",
+      "name": "实时通知中心", 
+      "folder": "notify",
       "files": [
-        {"name": "项目介绍", "file": "README.md"},
-        {"name": "使用说明", "file": "使用说明.md"}
+        {"name": "项目概述", "file": "README.md"},
+        {"name": "使用说明", "file": "USAGE.md"},
+        {"name": "开发文档", "file": "DEVELOPMENT.md"}
       ]
     }
   ]

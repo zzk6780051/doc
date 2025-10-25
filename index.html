@@ -392,11 +392,6 @@
                     </ul>
                 </div>
                 
-                <!-- Cloudflare Turnstile 验证 -->
-                <div class="turnstile-container">
-                    <p>请完成验证以继续访问</p>
-                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAB8dxiNIoXp1CwJ6" data-theme="auto"></div>
-                </div>
             </div>
         </div>
 
@@ -502,8 +497,6 @@
             applyTheme(state.theme);
             localStorage.setItem('theme', state.theme);
             
-            // 更新 Turnstile 主题
-            updateTurnstileTheme();
         }
 
         // 应用主题
@@ -514,34 +507,6 @@
                 dom.body.removeAttribute('data-theme');
             }
         }
-
-        // 更新 Turnstile 主题
-        function updateTurnstileTheme() {
-            const turnstileContainer = document.querySelector('.cf-turnstile');
-            if (turnstileContainer) {
-                // 重新渲染 Turnstile 以应用新主题
-                turnstileContainer.setAttribute('data-theme', state.theme);
-                
-                // 如果 Turnstile 已加载，重新渲染它
-                if (window.turnstile) {
-                    const sitekey = turnstileContainer.getAttribute('data-sitekey');
-                    const container = document.querySelector('.cf-turnstile');
-                    
-                    // 移除现有的 Turnstile
-                    container.innerHTML = '';
-                    
-                    // 重新渲染 Turnstile
-                    window.turnstile.render(container, {
-                        sitekey: sitekey,
-                        theme: state.theme,
-                        callback: function(token) {
-                            console.log('验证成功:', token);
-                        }
-                    });
-                }
-            }
-        }
-
         // 切换侧边栏
         function toggleSidebar() {
             if (dom.sidebar.classList.contains('collapsed')) {
@@ -850,6 +815,7 @@
     
     <!-- 引入 marked.js 用于解析 Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <script defer src="https://activify.china-zzk.com/tracker.min.js" data-website-id="China_zzk文档"></script>
 </body>
 </html>
