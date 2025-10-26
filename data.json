@@ -16,6 +16,24 @@
         {"name": "使用说明", "file": "USAGE.md"},
         {"name": "开发文档", "file": "DEVELOPMENT.md"}
       ]
+    },
+    {
+      "name": "脚本-ikuuu自动签到", 
+      "folder": "ikuuu",
+      "files": [
+        {"name": "项目概述", "file": "README.md"},
+        {"name": "使用说明", "file": "USAGE.md"},
+        {"name": "开发文档", "file": "DEVELOPMENT.md"}
+      ]
+    },
+        {
+      "name": "天气推送", 
+      "folder": "weather",
+      "files": [
+        {"name": "项目概述", "file": "README.md"},
+        {"name": "使用说明", "file": "USAGE.md"},
+        {"name": "开发文档", "file": "DEVELOPMENT.md"}
+      ]
     }
   ]
 }
